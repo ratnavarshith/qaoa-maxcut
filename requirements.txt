@@ -1,0 +1,10 @@
+qiskit>=1.0
+qiskit-aer>=0.13
+numpy
+scipy
+networkx
+matplotlib
+pytest
+
+# Optional baseline: Goemans-Williamson SDP. Skip if installation fails.
+# cvxpy
