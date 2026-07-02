@@ -1,12 +1,12 @@
 # QAOA for Max-Cut
 
-A reproducible QAOA implementation for the Max-Cut problem with INTERP
+A QAOA implementation for the Max-Cut problem with INTERP
 warm-start, four graph families, classical baselines, and a depolarizing-noise
 sweep. Built around the questions:
 
 - Does deeper QAOA actually beat classical polynomial-time algorithms?
 - How well does the INTERP heuristic (Zhou et al. 2020) recover from random
-  initialization at higher depths?
+initialization at higher depths?
 - At what gate-error rate does deeper QAOA become *worse* than shallow QAOA?
 
 ## Why this matters
@@ -22,8 +22,7 @@ Max-Cut asks for the vertex partition that maximizes crossing edges. It is NP-ha
 in general; the Goemans-Williamson SDP (1995) gives a 0.878-approximation in
 polynomial time and is the classical benchmark to beat.
 
-QAOA builds a circuit with p alternating layers — a cost unitary based on
-`H_C = Σ_{(i,j)∈E} (I - Z_i Z_j) / 2` and a mixing unitary — and optimizes the
+QAOA builds a circuit with p alternating layers, a cost unitary based on `H_C = Σ_{(i,j)∈E} (I - Z_i Z_j) / 2` and a mixing unitary, and optimizes the
 2p parameters classically with COBYLA. INTERP (Zhou et al. 2020) seeds each new
 depth from a linear interpolation of the previous optimum, which helps avoid
 local minima at p ≥ 3.
@@ -33,20 +32,20 @@ force (exact but O(2^n)), so graphs here stay small.
 
 ## What's in here
 
-| Module | Purpose |
-|---|---|
-| `qaoa_maxcut/qaoa.py` | Cost Hamiltonian, ansatz, COBYLA optimizer, INTERP |
-| `qaoa_maxcut/graphs.py` | Graph registry: ER, cycle, complete, random regular |
-| `qaoa_maxcut/baselines.py` | Brute-force optimum, random bitstring, GW SDP |
-| `qaoa_maxcut/persistence.py` | JSON + CSV result saving |
-| `qaoa_maxcut/plotting.py` | Landscape, depth, history, noise plots |
-| `examples/run_qaoa.py` | CLI: depth sweep + landscape + baselines |
-| `examples/noise_sweep.py` | CLI: noise sensitivity vs depth |
-| `tests/` | Pytest suite (graphs, baselines, qaoa, persistence) |
+| Module                       | Purpose                                             |
+| ----------------------------- | --------------------------------------------------- |
+| `qaoa_maxcut/qaoa.py`        | Cost Hamiltonian, ansatz, COBYLA optimizer, INTERP  |
+| `qaoa_maxcut/graphs.py`      | Graph registry: ER, cycle, complete, random regular |
+| `qaoa_maxcut/baselines.py`   | Brute-force optimum, random bitstring, GW SDP       |
+| `qaoa_maxcut/persistence.py` | JSON + CSV result saving                            |
+| `qaoa_maxcut/plotting.py`    | Landscape, depth, history, noise plots              |
+| `examples/run_qaoa.py`       | CLI: depth sweep + landscape + baselines            |
+| `examples/noise_sweep.py`    | CLI: noise sensitivity vs depth                     |
+| `tests/`                     | Pytest suite (graphs, baselines, qaoa, persistence) |
 
 ## Install
 
-```powershell
+```
 cd qaoa-maxcut
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1   # Windows PowerShell
@@ -57,12 +56,12 @@ pip install -r requirements.txt
 pip install cvxpy
 ```
 
-`cvxpy` is optional — the GW baseline is skipped automatically if it isn't
+`cvxpy` is optional, the GW baseline is skipped automatically if it isn't
 installed and the rest of the project runs unchanged.
 
 ## Run
 
-```powershell
+```
 # Default ER(6, 0.5), p_max=5, with random + GW baselines if available
 python -m examples.run_qaoa
 
@@ -81,37 +80,35 @@ python -m examples.noise_sweep --p-max 3 `
 
 Output goes to `results/` by default and includes:
 
-- `landscape.png` — p=1 cost landscape over (γ, β)
-- `depth_sweep.png` — approximation ratio vs depth, with random + GW baselines
-- `optimization_history.png` — COBYLA trace per depth
-- `noise_sweep.png` — approximation ratio vs depolarizing rate, per depth
-- `run_qaoa.json` / `run_qaoa.csv` — full results including parameters and
-  histories
-- `noise_sweep.json` / `noise_sweep.csv` — noise-sweep results
+- `landscape.png`: p=1 cost landscape over (γ, β)
+- `depth_sweep.png`: approximation ratio vs depth, with random + GW baselines
+- `optimization_history.png`: COBYLA trace per depth
+- `noise_sweep.png`: approximation ratio vs depolarizing rate, per depth
+- `run_qaoa.json` / `run_qaoa.csv`: full results including parameters and
+histories
+- `noise_sweep.json` / `noise_sweep.csv`: noise-sweep results
 
 ## Example results
 
 Verified run on cycle graph (n=4, p_max=2):
 
-```powershell
+```
 python -m examples.run_qaoa --graph cycle --n 4 --p-max 2
 ```
 
-p=1 approximation ratio: ~0.761  
+p=1 approximation ratio: ~0.761
 p=2 approximation ratio: 1.000 (optimal cut recovered)
 
-Generated: `landscape.png`, `depth_sweep.png`, `optimization_history.png`,
-`run_qaoa.json`, `run_qaoa.csv`.
+Generated: `landscape.png`, `depth_sweep.png`, `optimization_history.png`, `run_qaoa.json`, `run_qaoa.csv`.
 
 ## Test
 
-```powershell
+```
 pytest
 ```
 
 Covers graph generation, brute-force Max-Cut on small known instances
-(C_4 cycle = 4, C_5 cycle = 4, K_4 = 4), `cut_value`, INTERP length growth,
-`approx_ratio` on a perfect distribution, and a save/load roundtrip.
+(C_4 cycle = 4, C_5 cycle = 4, K_4 = 4), `cut_value`, INTERP length growth, `approx_ratio` on a perfect distribution, and a save/load roundtrip.
 
 ## Methodology
 
@@ -130,7 +127,7 @@ graphs, swap in a proven approximation (GW achieves ≥ 0.878 of the optimum).
 
 ### Why GW
 
-QAOA's interesting comparison isn't against random bitstrings — it's against
+QAOA's interesting comparison isn't against random bitstrings, it's against
 the best classical *polynomial-time* algorithm. On small random graphs, GW
 typically lands near 0.9 and QAOA at p ≈ 4 reaches the same neighborhood.
 Reporting both makes "did QAOA beat classical?" a real question.
@@ -139,7 +136,7 @@ Reporting both makes "did QAOA beat classical?" a real question.
 
 Deeper circuits compound gate errors. The depth-vs-noise tradeoff plot
 (`noise_sweep.png`) makes the point that bigger `p` is only better when gate
-fidelities are high enough — a key argument for hardware-aware QAOA depth
+fidelities are high enough, a key argument for hardware-aware QAOA depth
 selection on near-term devices.
 
 ## Limitations
@@ -148,7 +145,7 @@ selection on near-term devices.
 - COBYLA only; no parameter-shift gradients.
 - No hardware execution; depolarizing-noise simulation only.
 - Random Clifford and other families could be added; current registry is four
-  families.
+families.
 
 ## Future work
 
@@ -157,23 +154,8 @@ selection on near-term devices.
 - Hardware backend execution via `qiskit-ibm-runtime` Sampler.
 - Add a Multi-Angle QAOA (MA-QAOA) ansatz comparator.
 
-## Resume bullets
-
-- Implemented QAOA for Max-Cut with the INTERP warm-start heuristic
-  (Zhou et al. 2020) across four graph families (Erdős–Rényi, cycle,
-  complete, random regular), achieving near-Goemans-Williamson approximation
-  ratios at p = 4 on n = 6 instances.
-- Quantified the depth–noise tradeoff: deeper QAOA outperforms shallow QAOA
-  in the noiseless regime but degrades below shallow at depolarizing rates
-  ≥ 1%, motivating hardware-aware depth selection.
-- Built a reproducible CLI-driven experimental harness with JSON/CSV result
-  persistence, plotting, and a pytest suite covering Max-Cut on known
-  small-graph instances and the INTERP schedule.
-- Made cvxpy/Goemans-Williamson an optional dependency without compromising
-  the rest of the pipeline.
-
 ## References
 
-- Farhi, Goldstone, Gutmann 2014 — original QAOA.
-- Zhou, Wang, Choi, Pichler, Lukin 2020 — INTERP heuristic.
-- Goemans & Williamson 1995 — SDP relaxation + hyperplane rounding.
+- Farhi, Goldstone, Gutmann 2014, original QAOA.
+- Zhou, Wang, Choi, Pichler, Lukin 2020, INTERP heuristic.
+- Goemans & Williamson 1995, SDP relaxation + hyperplane rounding.
